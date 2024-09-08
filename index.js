@@ -109,20 +109,23 @@ module.exports.Trakt = class Trakt {
 
     // Get code to paste on login screen
     _device_code(str, type) {
-        const req = {
-            method: 'POST',
-            url: this._settings.endpoint + '/oauth/device/' + type,
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(str)
-        };
+    const req = {
+        method: 'POST',
+        url: this._settings.endpoint + '/oauth/device/' + type,
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(str)
+    };
 
-        this._debug(req);
-        return fetch(req.url, req).then(response => this._sanitize(JSON.parse(response.body))).catch(error => {
+    this._debug(req);
+    return fetch(req.url, req)
+        .then(response => response.text())
+        .then(data => data ? this._sanitize(JSON.parse(data)) : {})
+        .catch(error => {
             throw (error.response && error.response.statusCode == 401) ? Error(error.response.headers['www-authenticate']) : error;
         });
-    }
+}
 
     // Parse url before api call
     _parse(method, params) {
